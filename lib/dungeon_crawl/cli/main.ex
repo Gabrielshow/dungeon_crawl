@@ -12,18 +12,30 @@ defmodule DungeonCrawl.CLI.Main do
     Shell.info("You need to survive and find the exit.")
   end
   defp hero_choice do
-    DungeonCrawl.CLI.HeroChoice.start()
+    # DungeonCrawl.CLI.HeroChoice.start()
+    hero = DungeonCrawl.CLI.HeroChoice.start()
+    %{hero | name: "You"}
   end
+  defp crawl(%{hit_points: 0}, _) do
+    Shell.prompt("")
+    Shell.cmd("cls")
+    Shell.info("Unfortunately your wounds are too many to keep walking.")
+    Shell.info("You fall onto the floor without strength to carry on.")
+    Shell.info("Game over!")
+    Shell.prompt("")
+  end
+  
   defp crawl(character, rooms) do
     Shell.info("You keep moving forward to the next room.")
     Shell.prompt("Press Enter to continue")
     Shell.cmd("cls")
+    Shell.info(DungeonCrawl.Character.current_stats(character))
     rooms
     |> Enum.random
     |> DungeonCrawl.CLI.RoomActionsChoice.start
     |> trigger_action(character)
     |> handle_action_result
-  end
+end
   
   defp trigger_action({room, action}, character) do
     Shell.cmd("cls")
